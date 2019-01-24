@@ -1,41 +1,43 @@
 package application;
 
-import java.util.HashSet;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 
-import entities.Student;
+import entities.Candidate;
 
 public class Program {
 
 	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		Set<Student> set = new HashSet<>();
-		System.out.print("How many students for course A? ");
-		int a = sc.nextInt();
-		sc.nextLine();
-		for (int i = 1 ; i <= a; i++) {
-			int id = sc.nextInt();
-			sc.nextLine();
-			set.add(new Student(id));
-		}
-		System.out.print("How many students for course B? ");
-		int b = sc.nextInt();
-		for (int i = 1 ; i <= b; i++) {
-			int id = sc.nextInt();
-			set.add(new Student(id));
-		}
-		System.out.print("How many students for course C? ");
-		int c = sc.nextInt();
-		for (int i = 1 ; i <= c; i++) {
-			int id = sc.nextInt();
-			set.add(new Student(id));
-		}
-		System.out.println("Total students: " + set.size());
-		
-		
-		sc.close();
+			Scanner sc = new Scanner(System.in);
+			System.out.print("Enter file full path: ");
+			String path = sc.nextLine();
+			Map<Candidate,Integer> votes = new LinkedHashMap<>();
+			try (BufferedReader br = new BufferedReader(new FileReader(path))) {
 
+				String line = br.readLine();
+				while (line != null) {
+					String[] fields = line.split(",");
+					String name = fields[0];
+					int quantity = Integer.parseInt(fields[1]);
+					Candidate ps = new Candidate(name);
+					if (votes.containsKey(ps)) {
+						int count = votes.get(ps);
+						votes.put(ps, quantity + count);
+					} else {
+						votes.put(ps, quantity);
+					}
+					line = br.readLine();
+				}
+			} catch (IOException e) {
+				System.out.println("Error: " + e.getMessage());
+			}
+			for (Candidate key : votes.keySet()) {
+				System.out.println(key + ": " + votes.get(key));
+			}
+			sc.close();
 	}
-
 }
